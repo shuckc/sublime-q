@@ -43,13 +43,13 @@ class QUpdateCompletionsCommand(q_send.QSendRawCommand):
     if not self.settings.get('use_completion'):
       return
     try:
-      q = con.q
-      q.open()
-      res = q(QUpdateCompletionsCommand.query())
-      #print(res)
+      
+      res = con.q.k(QUpdateCompletionsCommand.query())
+      print(res)
+      print(con.fmt.format(res))
       compl = []
 
-      tb = res[b't']
+      tb = res['t']
       for x in tb.iteritems():
         t = x[0].decode('utf-8')
         compl.append((t + '\tTable', t))
@@ -59,13 +59,13 @@ class QUpdateCompletionsCommand(q_send.QSendRawCommand):
           compl.append((t + '\t' + c, c))
           compl.append((c + '\t' + t, c))
 
-      compl.extend(self.makeCompletions(res[b'v'], 'Variable'))
-      compl.extend(self.makeCompletions(res[b'f'], 'Function'))
-      compl.extend(self.makeCompletions(res[b'q'], 'q'))
+      compl.extend(self.makeCompletions(res['v'], 'Variable'))
+      compl.extend(self.makeCompletions(res['f'], 'Function'))
+      compl.extend(self.makeCompletions(res['q'], 'q'))
       compl.extend(self.makeCompletions(['select', 'from', 'update', 'delete'], 'q'))
       nscompl=[]
       nscomplwdot=[]
-      ns = res[b'ns']
+      ns = res['ns']
       for x in ns.iteritems():
         n = x[0].decode('utf-8')
         nscompl.append((n[1:] + '\tNamespace', n[1:]))
@@ -80,7 +80,7 @@ class QUpdateCompletionsCommand(q_send.QSendRawCommand):
       self.view.settings().set('q_nscompl', nscompl)
       self.view.settings().set('q_nscomplwdot', nscomplwdot)
     finally:
-      q.close()
+      pass
 
   def makeCompletions(self, l, t):
     out = []

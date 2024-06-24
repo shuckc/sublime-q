@@ -114,28 +114,12 @@ NOTE: You may need to change dir to `q KDB`
 * OS X: `~/Library/Application Support/Sublime Text 3/Packages`
 
 ```
-git clone https://github.com/komsit37/sublime-q.git 'q KDB'
+git clone https://github.com/shuckc/sublime-q.git 'q KDB'
 ```
-From sublime text, run package control: satisfy dependencies (you may need to open package folder in sublime text first). This will install numpy as a dependency package to your packages folder
 
 ### Supported OS
-* osx_x64
+* osx
 * windows_x64
-* linux_x64
-
-### Unsupported OS
-Support could be extended by adding the proper numpy 1.8 build with python 3.3 (see https://github.com/komsit37/sublime-q/issues/12). Please send a PR if you can build any of these:
-* osx_x32
-* windows_x32
-* linux_x32
+* linux
 
 This plugin is for Sublime Text 3. For Sublime Text 2, please use https://github.com/komsit37/sublime-q-2
-
-### To build numpy
-The included numpy version should work for osx and windows 64bit, but if you need to build numpy:
-
-1. download python 3.3
-2. download http://sourceforge.net/projects/numpy/files/NumPy/1.8.1/
-3. run `python3.3 setup.py install`
-4. numpy will be installed to your default python lib
-5. then follow steps here https://github.com/komsit37/sublime-q/issues/12

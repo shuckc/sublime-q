@@ -1,9 +1,8 @@
 import sublime
 import sublime_plugin
 
-from .qpython.qtype import QException
+from .aiokdb.aiokdb import KException
 from socket import error as socket_error
-import numpy
 import datetime
 
 from . import q_chain
@@ -45,9 +44,9 @@ class QSendRawCommand(q_chain.QChainCommand):
     @staticmethod
     def executeRaw(con, input):
         try:
-            q = con.q
-            q.open()
-
+            
+            # q.open()
+            print('running query')
             input_prefix = input[:5] # probably .Q.s or .j.j -- make more generic later if necessary
             input_body = input[5:]
 
@@ -55,7 +54,7 @@ class QSendRawCommand(q_chain.QChainCommand):
             write_query = '@[{`.st.tmp set x;`sublimeq};();0b]'
             initial_query = '(' + mem_query + ';' + write_query + ')'
 
-            pre_res = q(initial_query)
+            pre_res = con.q.k(initial_query)
 
             try:
                 write_flag = util.decode(pre_res[1]) == 'sublimeq'
@@ -67,13 +66,14 @@ class QSendRawCommand(q_chain.QChainCommand):
             input =  input_prefix + ('.st.tmp:' if write_flag else '') + input_body
 
             start_time = datetime.datetime.now()
-            res = util.decode(q(input))
+            resq = con.q.k(input)
+            res = con.fmt.format(resq)
             end_time = datetime.datetime.now()
             time = str(end_time - start_time)[2:-3]
 
             dims_query = '$[@[{`tmp in key x};`.st;0b];" x " sv string (count @[{$[0<=type x; cols x;()]};.st.tmp;()]),count .st.tmp;0]'
             post_query = '(' + mem_query + ';' + dims_query + ')'
-            post_res = q(post_query)
+            post_res = con.q.k(post_query)
 
             try:
                 end_mem = int(util.decode(post_res[0]))
@@ -92,7 +92,7 @@ class QSendRawCommand(q_chain.QChainCommand):
 
             status = 'Result: ' + dims + ', ' + time + ', ' + sign + mem
             #self.view.set_status('result', 'Result: ' + count + ', ' + time + ', ' + sign + mem)
-        except QException as e:
+        except KException as e:
             res = "error: `" + util.decode(e)
             status = "error: `" + util.decode(e)
         except socket_error as serr:
@@ -101,7 +101,9 @@ class QSendRawCommand(q_chain.QChainCommand):
             res = ""
             status = "error: " + str(serr)
         finally:
-            q.close()
+            # q.close()
+            print("not closing")
+            pass
 
         #self.view.set_status('q', con.status())
         return {'result': res, 'status': status}

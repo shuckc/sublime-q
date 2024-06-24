@@ -1,6 +1,9 @@
 import sublime, sublime_plugin
-from .qpython import qconnection
-from .qpython.qtype import QException
+
+from .aiokdb.aiokdb.socket import khpu
+from .aiokdb.aiokdb.format import AsciiFormatter
+from .aiokdb.aiokdb import KException
+
 from socket import error as socket_error
 from . import util
 
@@ -15,7 +18,9 @@ class QCon():
         self.port = port
         self.username = username
         self.password = password
-        self.q = qconnection.QConnection(host = self.host, port = self.getPort(), username = self.username, password = self.password, encoding = 'UTF-8')
+        auth = "{0}:{1}".format(self.username, self.password)
+        self.q = khpu(host = self.host, port = self.getPort(), auth=auth)
+        self.fmt = AsciiFormatter(height=500)
 
     @classmethod
     def fromH(cls, h):
@@ -128,22 +133,19 @@ class QCon():
         except:
             mem = ''
 
-
         return status + ': ' + name + hdb + '> ' + self.hstatus() + mem
 
     def checkOk(self):
         try:
-            self.q.open()
+            # self.q.open()
             if not self.init:
                 #only call at first time
                 print('init ' + self.h())
                 #self.q('system "c 2000 2000"')  #expand output to max 2000 chars
                 self.init = True
-            self.mem = self.q('@[{.Q.w[][`used]};();0]')
-        except QException as e:
+            self.mem = self.q.k('@[{.Q.w[][`used]};();0]')
+        except KException as e:
             return False
         except socket_error as serr:
             return False
-        finally:
-            self.q.close()
         return True

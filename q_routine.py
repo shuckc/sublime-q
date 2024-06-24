@@ -7,7 +7,7 @@ import os
 import webbrowser
 #import pprint
 from . import util
-from .qpython.qtype import QException
+from .aiokdb.aiokdb import KException
 from socket import error as socket_error
 
 #fix unicode encoding issue when rendering template with non-ascii string
@@ -148,7 +148,7 @@ class QRoutineCommand(sublime_plugin.TextCommand):
         #webbrowser.open_new(url)
         #print(os.getcwd()) #/Users/pkomsit/Applications/Sublime Text.app/Contents/MacOS
     #todo: these two error handlings are duplicated from QSendRaw.executeRaw. try to refactor them
-    except QException as e:
+    except KException as e:
         error = "error: `" + util.decode(e)
         self.view.run_command(command.get('output'), {"input": error})
     except socket_error as serr:
